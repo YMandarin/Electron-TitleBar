@@ -45,7 +45,7 @@ function init(){
         onMac = true;
     }
 
-    win = new Window({width:1200,height:720,frame:false,backgroundColor:"#282828"},"/pages/mainPage.html");
+    win = new Window({width:1200,height:720,frame:false,backgroundColor:"#1E1E1E"},"/pages/mainPage.html");
 
     win.openDevTools();
 

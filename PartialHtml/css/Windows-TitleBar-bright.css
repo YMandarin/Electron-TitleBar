@@ -1,26 +1,47 @@
 #TitleBar{
     background-color: white;
+    width: 100%;
+
+}
+
+#TitleBar-right{
+    float: right;
+    margin-left: auto;
+    -webkit-app-region:no-drag;
+    display: flex;
+    flex-direction: row;
+}
+
+.TitleBar-left{
+    -webkit-app-region: no-drag;
 }
 
 .TitleBar-ButtonIcon{
-    stroke:black;
+    stroke:rgb(80, 80, 80);
     stroke-width: 1;
     fill:none;
     shape-rendering: crispEdges;
 }
 
-#TitleBar-right{
-    float: right;
+.TitleBar-Button{
+    margin: 0;
+    padding: 0;
+    background-color: inherit;
+    border: none;
 }
 
 .TitleBar-Button:hover{
-    background-color: rgba(200,200,200,0.7);
+    background-color: rgba(70,70,70,0.2);
+}
+
+.TitleBar-Button:hover .TitleBar-ButtonIcon{
+    stroke:black;
 }
 
 #TitleBar-CloseButton:hover{
     background-color: red;
 }
 
-#TitleBar-CloseButton:hover path{
-    stroke:black;
+#TitleBar-CloseButton:hover .TitleBar-ButtonIcon{
+    stroke:white;
 }
