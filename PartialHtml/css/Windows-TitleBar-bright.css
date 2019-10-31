@@ -1,0 +1,26 @@
+#TitleBar{
+    background-color: white;
+}
+
+.TitleBar-ButtonIcon{
+    stroke:black;
+    stroke-width: 1;
+    fill:none;
+    shape-rendering: crispEdges;
+}
+
+#TitleBar-right{
+    float: right;
+}
+
+.TitleBar-Button:hover{
+    background-color: rgba(200,200,200,0.7);
+}
+
+#TitleBar-CloseButton:hover{
+    background-color: red;
+}
+
+#TitleBar-CloseButton:hover path{
+    stroke:black;
+}
