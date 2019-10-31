@@ -9,6 +9,8 @@ class Window extends BrowserWindow{
 
     constructor(parameter,urlFromDir = null){
 
+        parameter.webPreferences = {nodeIntegration: true}
+
         super(parameter);
 
         if (urlFromDir !== null){
@@ -23,7 +25,7 @@ class Window extends BrowserWindow{
     loadURL(urlFromDir){
         super.loadURL(url.format({
             pathname: path.join(__dirname,urlFromDir),
-            protocol:"file",
+            protocol:"file:",
             slashes: true
         }));
     }
@@ -43,9 +45,11 @@ function init(){
         onMac = true;
     }
 
-    win = new Window({width:1200,height:720},"Pages/index.html");
+    win = new Window({width:1200,height:720,frame:false,backgroundColor:"#282828"},"/pages/mainPage.html");
 
     win.openDevTools();
+
+    win.removeMenu();
     
 }
 
