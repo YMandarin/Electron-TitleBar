@@ -5,37 +5,55 @@ const url = require("url");
 let win;
 let onMac = false;
 
-//create first Window
-function createWindow(){
-    if(process.platform === "darwin"){
+class Window extends BrowserWindow{
+
+    constructor(parameter,urlFromDir = null){
+
+        super(parameter);
+
+        if (urlFromDir !== null){
+            this.loadURL(urlFromDir);
+        }
+
+        this.on("close",()=>{
+            dispose(this);
+        });
+    }
+
+    loadURL(urlFromDir){
+        super.loadURL(url.format({
+            pathname: path.join(__dirname,urlFromDir),
+            protocol:"file",
+            slashes: true
+        }));
+    }
+
+    openDevTools(){
+        this.webContents.openDevTools();
+    }
+}
+
+function dispose(obj){
+    obj = null;
+}
+
+function init(){
+
+    if(process.platform == "darwin"){
         onMac = true;
     }
 
-    win = new BrowserWindow({width:1200,height:720});
+    win = new Window({width:1200,height:720},"Pages/index.html");
 
-    win.loadURL(url.format({
-        pathname: path.join(__dirname,"pages/index.html"),
-        protocol: "file",
-        slashes: true
-    }));
-
-    win.on("closed", ()=>{
-        win = null;
-    });
-
-    openDevTools();
-
+    win.openDevTools();
+    
 }
 
-//open devTools of Chromium
-function openDevTools(){
-    win.webContents.openDevTools();
-}
 
-app.on("ready",createWindow);
+// app events
+app.on("ready",init);
 
 app.on("window-all-closed",()=>{
-    if (onMac){
-        app.quit();
-    }
+    app.quit();
 });
+
