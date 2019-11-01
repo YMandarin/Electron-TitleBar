@@ -5,13 +5,15 @@
     <title>helloWorld</title>
     <link rel="stylesheet" href="../css/mainPage.css">
     
-    <script src="../Partial/TitleBar/titleBar-script.js"></script>
+   <script src="../Partial/TitleBar/titleBar-script.js"></script>
 </head>
 
 <body>
     <script>
-        const titleBar = new TitleBar();
-        titleBar.appendTo();
+        
+
+        let titleBar = new TitleBar({darkMode:true});
+        titleBar.append();
     </script>
     
     <span id="outputText"></span>

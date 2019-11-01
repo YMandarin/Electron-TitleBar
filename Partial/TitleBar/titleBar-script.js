@@ -4,10 +4,17 @@ const defaultCSS = require("defaultcss");
 const fs = require("fs");
 const path = require("path");
 
+
+/**
+ * portable titlebar class for creating a windows-titlebar per options
+ * 
+ */
 class TitleBar{
     /**
      * Create Title bar
+     * @constructor
      * @param {Object=} options : Titlebar config (Object)
+     * @param {Boolean=} options.darkMode : set default to dark(default:bright)
      * @param {String=} options.backgroundColor : Background of the title bar (String="white")
      * @param {String=} options.iconColor : color of the button icons (String="rgb(150,150,150)")
      * @param {String=} options.iconColor_hover : color of the button icons when hovering (String="black")
@@ -15,7 +22,7 @@ class TitleBar{
      * @param {String=} options.closeButtonBackground_hover : Background of the closebutton when hovering (String="red")
      * @param {String=} options.closeIconColor_hover : color of the close icon when hovering (String="white")
      * 
-     * @param {String=} icon : path from __dirname of the icon on the left
+     * @param {String=} icon : absolute Pah of the icon on the left
      * 
      * @param {Array=} menu : Window-menu on the left in json format (array) 
      * @param {Object=} menu[x] : Menu-button (object)
@@ -29,14 +36,29 @@ class TitleBar{
      */
     constructor(options = {}, icon = null, menu = []){
 
-        this.options = {
-            backgroundColor: "white",
-            iconColor: "rgb(100,100,100)",
-            iconColor_hover: "black",
-            buttonBackground_hover: "rgba(150,150,150,0.2)",
-            closeButtonBackground_hover: "red",
-            closeIconColor_hover: "white"
+        if(options.darkMode === true){
+
+            this.options = {
+                backgroundColor: "rgb(51,51,51)",
+                iconColor: "rgb(150,150,150)",
+                iconColor_hover: "white",
+                buttonBackground_hover: "rgba(150,150,150,0.2)",
+                closeButtonBackground_hover: "red",
+                closeIconColor_hover: "white"
+            }
         }
+        else{
+
+            this.options = {
+                backgroundColor: "white",
+                iconColor: "rgb(100,100,100)",
+                iconColor_hover: "black",
+                buttonBackground_hover: "rgba(150,150,150,0.2)",
+                closeButtonBackground_hover: "red",
+                closeIconColor_hover: "white"
+            }
+        }
+        
 
         this.options.backgroundColor = ( (options.backgroundColor != null) ? options.backgroundColor : this.options.backgroundColor)
         this.options.iconColor = ( (options.iconColor != null) ? options.iconColor : this.options.iconColor)
@@ -51,24 +73,38 @@ class TitleBar{
             document.getElementById("TitleBar-icon").src = icon;
         }
 
-        let titleText = fs.readFileSync(path.join(__dirname,"..","Partial","TitleBar","titlebar.html"),"utf-8");
-        this.titleView = domify(titleText,document);
+        
+        this.titleView = domify(this.makeHTML(),document);
 
         this.fullscreen = false;
+
+        
     }
     
-    appendTo(target=document.body){
+    append(target=document.body){
 
         target.appendChild(this.titleView);
 
         this.handleEvents();
 
         defaultCSS("TitleBar",this.makeCSS());
+
+        if(window.outerWidth == screen.availWidth & window.outerHeight == screen.availHeight){
+
+            this.fullscreen = true;
+            document.getElementById("TitleBar-MinimizeIcon").style.display = "initial";
+            document.getElementById("TitleBar-MaximizeIcon").style.display = "none";
+        }
+        else{
+            
+            this.fullscreen = false;
+            document.getElementById("TitleBar-MinimizeIcon").style.display = "none";
+            document.getElementById("TitleBar-MaximizeIcon").style.display = "initial";
+            
+        }
     }
 
     handleEvents(){
-
-        
 
         const win =  remote.getCurrentWindow();
 
@@ -87,11 +123,13 @@ class TitleBar{
             if(this.fullscreen){
                 win.unmaximize();
                 this.fullscreen = false;
+                setMaxIcon();
 
             }
             else{
                 win.maximize();
                 this.fullscreen = true;
+                setMinIcon();
             }
         });
         
@@ -106,12 +144,28 @@ class TitleBar{
 
             if(window.outerWidth == scr.availWidth & window.outerHeight == scr.availHeight){
                 this.fullscreen = true;
+                setMinIcon();
             }
             else{
-                this.fullscreen = false;
+                if(this.fullscreen == true){
+                    this.fullscreen = false;
+                    setMaxIcon();
+                }
+                
             }
         
         });
+
+        function setMaxIcon(){
+           
+            document.getElementById("TitleBar-MinimizeIcon").style.display = "none";
+            document.getElementById("TitleBar-MaximizeIcon").style.display = "initial";
+        }
+
+        function setMinIcon(){
+            document.getElementById("TitleBar-MinimizeIcon").style.display = "initial";
+            document.getElementById("TitleBar-MaximizeIcon").style.display = "none";
+        }
 
 
     }
@@ -171,7 +225,54 @@ class TitleBar{
 
     }
 
+    makeHTML(){
+        let html = `
+        <div id="TitleBar">
+
+            <div id="TitleBar-left">
+                <img src="" id="TitleBar-icon"></img>
+            </div>
+
+            <div id="TitleBar-right">
+
+                <Button id="TitleBar-HideButton" class="TitleBar-Button">
+
+                    <svg height="28" width=46 id="TitleBar-HideIcon">
+                        <line class="TitleBar-ButtonIcon"  y1="15" y2="15" x1="18" x2="28">
+                    </svg>
+
+                </Button>
+
+                <Button id="TitleBar-MaxMinimizeButton" class="TitleBar-Button">
+
+                    <svg height="28" width=46 id="TitleBar-MaximizeIcon">
+                        <rect class="TitleBar-ButtonIcon" y="10" x="19" width="10" height="10">
+                    </svg>
+
+                    <svg height="28" width=46 id="TitleBar-MinimizeIcon" >
+                            <path d="M 20,20 L 20,12 L 28,12 L 28,20 Z" class="TitleBar-ButtonIcon" />
+                            <path d="M 22,12 L 21,10 L 30,10 L 30,18 L 28,18" class="TitleBar-ButtonIcon" />
+                    </svg>
+
+                </Button>
+
+                <button id="TitleBar-CloseButton" class="TitleBar-Button">
+
+                    <svg height="28" width=46 id="TitleBar-CloseIcon">
+                            <path d="M 18,20 L 28,10" class="TitleBar-ButtonIcon" />
+                            <path d="M 18,10 L 28,20" class="TitleBar-ButtonIcon" />
+                    </svg>
+
+                </button>
+
+            </div>
+
+        </div>
+        `
+        return html;
+    }
 
 }
 
 
+module.exports = TitleBar
