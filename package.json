@@ -9,6 +9,8 @@
   "author": "me",
   "license": "ISC",
   "dependencies": {
+    "defaultcss": "^1.1.1",
+    "domify": "^1.4.0",
     "electron": "^7.0.0"
   }
 }
