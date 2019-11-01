@@ -7,6 +7,10 @@ body{
     
 }
 
+button:focus{
+    outline:none;
+}
+
 *{
     color:white;
 }
