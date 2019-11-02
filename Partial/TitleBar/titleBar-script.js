@@ -3,14 +3,17 @@ const domify = require("domify");
 const defaultCSS = require("defaultcss");
 const Hotkeys = require("hotkeys-js");
 
+
 /**
  * @fileoverview 
  * Portable titlebar js file for creating a windows-titlebar.
  * Import this file into html and create a TitleBar object.
  * Two default styles: bright & dark (default:white)
+ * call obj.append(target) for appending the Titlebar to the target (default:body)
  * @param options - set default and set colors in options (set to {} for default and an icon...)
  * @param icon - path to icon for icon on the right (set to null for no icon but a menu)
- * @param menu - set window menu in the title bar in json format
+ * @param menu - set window menu in the title bar in json format (set to null for no menu but a title)
+ * @param Title - set window Title in the middle of the titlebar
  */
 
 
@@ -26,6 +29,7 @@ class TitleBar{
      * @param {String=} options.buttonBackground_hover - Background of button when hovering (String)
      * @param {String=} options.closeButtonBackground_hover - Background of the closebutton when hovering (String)
      * @param {String=} options.closeIconColor_hover - color of the close icon when hovering (String)
+     * @param {String=} options.titleColor - text-color of the title in the middle
      * 
      * @param {Object=} options.menu - options for window-menu on the left (object)
      * @param {String=} options.menu.textColor - text-color of all buttons in menu (String)
@@ -46,11 +50,13 @@ class TitleBar{
      * @param {Array=} menu[x].popup - Menu-button popup (array)
      * @param {Object=} menu[x].popup[x] - Menu-button popup item (object)
      * @param {Boolean=} menu[x].popup[x].line - Menu-button popup line (bool:false) (determent if item is a line or a button)
-     * @param {String=} menu[x].popup[x].text - Menu-button popup Button-text 
-     * @param {string=} menu[x].popup[x].hotkey - Menu-button popup Hotkey(syntax of hotkey-js module)
-     * @param {string=} menu[x].popup[x].click - Menu-button popup buttonclick event (function/eventListener)
+     * @param {String=} menu[x].popup[x].text - Menu-button popup Button-text (String)
+     * @param {String=} menu[x].popup[x].hotkey - Menu-button popup Hotkey (String) (syntax of hotkey-js module)
+     * @param {String=} menu[x].popup[x].click - Menu-button popup buttonclick event (function/eventListener)
+     * 
+     * @param {String=} Title - Title text in the middle (String) (also html as string)
      */
-    constructor(options = {}, icon = null, menu = []){
+    constructor(options = {}, icon = null, menu = [],Title=null){
 
         if(options.darkMode === true){
 
@@ -61,12 +67,13 @@ class TitleBar{
                 buttonBackground_hover: "rgba(150,150,150,0.2)",
                 closeButtonBackground_hover: "red",
                 closeIconColor_hover: "white",
+                titleColor:"rgb(150,150,150)",
 
                 menu:{
                     textColor:"rgb(150,150,150)",
                     popupBackgroundColor: "rgb(31,31,31)",
                     hotkeyColor: "rgb(100,100,100)",
-                    ButtonBackground_hover: "rgba(150,150,150,0.3)",
+                    buttonBackground_hover: "rgba(150,150,150,0.3)",
                     popupButtonBackground_hover: "rgb(0, 78, 122);",
                     ButtonBackground_focused: "rgba(150,150,150,0.3)",
                     popupLineColor: "rgb(150,150,150)",
@@ -82,6 +89,7 @@ class TitleBar{
                 buttonBackground_hover: "rgba(150,150,150,0.4)",
                 closeButtonBackground_hover: "red",
                 closeIconColor_hover: "white",
+                titleColor:"rgb(100,100,100)",
 
                 menu:{
                     textColor:"rgb(100,100,100)",
@@ -90,7 +98,7 @@ class TitleBar{
                     buttonBackground_hover: "rgba(150,150,150,0.4)",
                     popupButtonBackground_hover: "rgba(150,150,150,0.3)",
                     ButtonBackground_focused: "rgba(150,150,150,0.3)",
-                    popupLineColor: "rgb(150,150,150)",
+                    popupLineColor: "rgb(100,100,100)",
                 }
             }
         }
@@ -102,7 +110,8 @@ class TitleBar{
         this.options.buttonBackground_hover = ( (options.buttonBackground_hover != null) ? options.buttonBackground_hover : this.options.buttonBackground_hover)
         this.options.closeButtonBackground_hover = ( (options.closeButtonBackground_hover != null) ? options.closeButtonBackground_hover : this.options.closeButtonBackground_hover)
         this.options.closeIconColor_hover = ( (options.closeIconColor_hover != null) ? options.closeIconColor_hover : this.options.closeIconColor_hover)
-        
+        this.options.titleColor = ( (options.titleColor != null) ? options.titleColor : this.options.titleColor)
+
         if(options.menu!=undefined||options.menu!=null){
 
         this.options.menu.textColor = ( (options.menu.textColor != null) ? options.menu.textColor : this.options.menu.textColor)
@@ -114,15 +123,26 @@ class TitleBar{
         this.options.menu.popupLineColor = ( (options.menu.popupLineColor != null) ? options.menu.popupLineColor : this.options.menu.popupLineColor)
         
         }
+
+        if (!Array.isArray(menu)){
+            
+            menu = [];
+        }
+
         this.menu = menu;
 
         this.icon = icon;
         
+        this.title = ((Title!=null)? Title : "");
+
         this.titleView = domify(this.makeHTML(),document);
 
         this.fullscreen = false;
 
         
+        
+        
+
     }
     
     append(target=document.body){
@@ -232,24 +252,65 @@ class TitleBar{
             background-color: ${this.options.backgroundColor};
             width: 100%;
             height:30px;
-        
+            display:flex;
+            flex-direction:row;
+
+            font:400 13.333px Arial;
+            -webkit-app-region:drag;
+            
+            min-width:138px;
+            
         }
         
         #TitleBar-right{
-            float: right;
-            margin-left: auto;
-            -webkit-app-region:no-drag;
+            flex: 1 0 auto;
+            
             display: flex;
             flex-direction: row;
+
+            justify-content:flex-end;
+        }
+
+        #TitleBar-right button{
+            -webkit-app-region:no-drag;
+        }
+
+        #TitleBar-middle{
+            margin:0;
+            line-height:30px;
+            color:${this.options.titleColor};
+            flex: 1 1 auto;
+
+            min-width:0; 
+
+            overflow:hidden;
+
+            text-align:center;
+           
         }
         
         #TitleBar-left{
-            -webkit-app-region: no-drag;
+            
             height:30px;
             display:flex;
             flex-direction:row;
+
+            min-width:0; 
+            overflow:hidden;
+
+            flex: 1 1 auto;
+        }
+
+        #TitleBar-left button{
+            -webkit-app-region: no-drag;
         }
         
+        #TitleBar-icon{
+            -webkit-app-region:drag;
+            margin:3px;
+            height:24px;
+        }
+
         .TitleBar-ButtonIcon{
             stroke:${this.options.iconColor};
             stroke-width: 1;
@@ -281,10 +342,7 @@ class TitleBar{
         }
 
         /*menu style*/
-        #TitleBar-icon{
-            margin:3px;
-            height:24px;
-        }
+        
 
         ul{
             list-style: none;
@@ -303,6 +361,7 @@ class TitleBar{
               position:absolute;
               background-color:${this.options.menu.popupBackgroundColor};
               visibility:hidden;
+             
           }
           
           .TitleBar-MenuPopup{
@@ -313,9 +372,9 @@ class TitleBar{
           .TitleBar-MenuPopupButton{
               color:${this.options.menu.textColor};
               text-align: left;
-              height: 30px;
+              
               width:100%;
-              padding:0 20px;
+              padding:6px 20px;
               background:none;
               border:none;
           
@@ -331,7 +390,7 @@ class TitleBar{
               background:none;
               border: none;
               height:30px;
-              padding:0 10px;
+              padding:0 7px;
           }
 
           .TitleBar-MenuButton:hover{
@@ -343,7 +402,7 @@ class TitleBar{
             background:${this.options.menu.ButtonBackground_focused};
             border: none;
             height:30px;
-            padding:0 10px;
+            padding:0 7px;
           }
           
           .TitleBar-MenuPopupKeyshortcut{
@@ -360,22 +419,27 @@ class TitleBar{
               border-bottom:${this.options.menu.popupLineColor} 1px solid;
           }
           
-
+          
         `
         return css;
 
     }
 
     makeHTML(){
+        console.log(this.title);
         let html = `
         <div id="TitleBar">
 
+            <img src=""id="TitleBar-icon"></img>
             <div id="TitleBar-left" >
-                <img src=""id="TitleBar-icon"></img>
+                
+            </div>
+
+            <div id="TitleBar-middle">
+                ${this.title}
             </div>
 
             <div id="TitleBar-right">
-
                 <Button id="TitleBar-HideButton" class="TitleBar-Button">
 
                     <svg height="27" width=46 id="TitleBar-HideIcon">
@@ -405,89 +469,96 @@ class TitleBar{
                     </svg>
 
                 </button>
-
             </div>
-
         </div>
         `
         return html;
     }
 
     setHotkeys(menu){
-        for(let item of menu){
+        if(menu!=null){
+            for(let item of menu){
     
-            if(item !=null & item.popup != null){
-    
-                
-                for(let button of item.popup){
-                    if(button.hotkey != null & button.hotkey!="" & button.click !=null){
-    
-                        let hotkey = button.hotkey;
-                        hotkey.trim();
-                        hotkey.toLowerCase();
-    
-                        Hotkeys(hotkey,function(event,handler){
-                            event.preventDefault();
-                            button.click();
-                        });
-                    }
-                }       
+                if(item !=null & item.popup != null){
+        
+                    
+                    for(let button of item.popup){
+                        if(button.hotkey != null & button.hotkey!="" & button.click !=null){
+        
+                            let hotkey = button.hotkey;
+                            hotkey.trim();
+                            hotkey.toLowerCase();
+        
+                            Hotkeys(hotkey,function(event,handler){
+                                event.preventDefault();
+                                button.click();
+                            });
+                        }
+                    }       
+                }
             }
         }
+        
     }
 
     createMenuHTML(menu){
-        let clicks = [];
+        if(menu!=null){
+            
+            let clicks = [];
     
-        let html = "";
-    
-        html += `<ul id="TitleBar-Menu">\n`;
-    
-        let i1 = 0;
-        let i2 = 0;
-    
-        for (let item of menu){
-            i2 = 0;
-            html += `<li class="TitleBar-MenuItem">\n`;
-    
-            if(item.click!=null){
-                html += `<Button class="TitleBar-MenuButton" onclick="menuButton_events(this,${i1})">${item.text}</Button>\n`
-            }
-            else{
-                if(item.popup!=[] || item.popup!=null){
-                    html += `<Button class="TitleBar-MenuButton" onclick="menuButton_click(this,${i1})" onmouseover="menuButton_mouseover(this,${i1})">${item.text}</Button> 
-                        <div class="TitleBar-MenuPopup">
-                        <ul>\n`
-                    
-                    for (let button of item.popup){
-                        html += `<li>\n`;
-                            if(!button.line){
-                                if(button.hotkey!=null&button.hotkey!=undefined&button.hotkey!=""){
-                                    html +=  `<button class="TitleBar-MenuPopupButton" onclick="popupButton_events(this,${i1},${i2})"> ${button.text} <div class="TitleBar-MenuPopupKeyshortcut">${button.hotkey}</div> </button>\n`;
+            let html = "";
+        
+            html += `<ul id="TitleBar-Menu">\n`;
+        
+            let i1 = 0;
+            let i2 = 0;
+        
+            for (let item of menu){
+                i2 = 0;
+                html += `<li class="TitleBar-MenuItem">\n`;
+        
+                if(item.click!=null){
+                    html += `<Button class="TitleBar-MenuButton" onclick="menuButton_events(this,${i1})">${item.text}</Button>\n`
+                }
+                else{
+                    if(item.popup!=[] || item.popup!=null){
+                        html += `<Button class="TitleBar-MenuButton" onclick="menuButton_click(this,${i1})" onmouseover="menuButton_mouseover(this,${i1})">${item.text}</Button> 
+                            <div class="TitleBar-MenuPopup">
+                            <ul>\n`
+                        
+                        for (let button of item.popup){
+                            html += `<li>\n`;
+                                if(!button.line){
+                                    if(button.hotkey!=null&button.hotkey!=undefined&button.hotkey!=""){
+                                        html +=  `<button class="TitleBar-MenuPopupButton" onclick="popupButton_events(this,${i1},${i2})"> ${button.text} <div class="TitleBar-MenuPopupKeyshortcut">${button.hotkey}</div> </button>\n`;
+                                    }
+                                    else{
+                                        html +=  `<button class="TitleBar-MenuPopupButton" onclick="popupButton_events(this,${i1},${i2})"> ${button.text}</button>\n`;
+                                    }
+                                    
                                 }
                                 else{
-                                    html +=  `<button class="TitleBar-MenuPopupButton" onclick="popupButton_events(this,${i1},${i2})"> ${button.text}</button>\n`;
+                                    html +=  `<div class="TitleBar-MenuPopupLine"></div>\n`;
                                 }
-                                
-                            }
-                            else{
-                                html +=  `<div class="TitleBar-MenuPopupLine"></div>\n`;
-                            }
-    
-                        html += `</li>\n`;
-                        i2++;
+        
+                            html += `</li>\n`;
+                            i2++;
+                        }
+                        html+= `</ul>\n`
                     }
-                    html+= `</ul>\n`
                 }
+        
+                html += `</li>\n`;
+                i1++;
             }
-    
-            html += `</li>\n`;
-            i1++;
+        
+            html += `</ul>\n`;
+        
+            return html;
         }
-    
-        html += `</ul>\n`;
-    
-        return html;
+
+        return "";
+        
     
     }
 

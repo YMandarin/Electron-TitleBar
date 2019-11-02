@@ -7,23 +7,18 @@ body{
     
 }
 
+*{
+    font-family: sans-serif;
+}
+
 button:focus{
     outline:none;
 }
-
+ 
 *{
-    color:white;
+    -webkit-user-select: none;
 }
 
-#TitleBar{
-    -webkit-app-region:drag;
-}
-#TitleBar{
-    display:flex;
-    flex-direction: row;
-}
-
-
-.TitleBar-ButtonsRight{
-    margin-left: auto;
+body{
+    overflow:hidden;
 }

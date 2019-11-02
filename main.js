@@ -45,14 +45,13 @@ function init(){
         onMac = true;
     }
 
-    win = new Window({width:1200,height:720,frame:false,backgroundColor:"#1E1E1E"},"/pages/mainPage.html");
+    win = new Window({width:1200,height:720,frame:false,minWidth:166,backgroundColor:"#1E1E1E"},"/pages/mainPage.html");
 
     win.openDevTools();
 
     win.removeMenu();
     
 }
-
 
 // app events
 app.on("ready",init);

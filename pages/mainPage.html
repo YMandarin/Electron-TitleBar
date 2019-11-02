@@ -15,60 +15,62 @@
                 text:"File",
                 popup:[
                     {
-                        text:"open devTools",
+                        text:"exit",
+                        click:()=>{
+                            remote.getCurrentWindow().close();
+                        }
+                    },
+                ]
+            },
+            {
+                text:"View",
+                popup:[
+                    {
+                        
+                        text:"Reload",
+                        click:()=>{
+                            remote.getCurrentWindow().reload();
+                        },
+                        hotkey:"Ctrl+R"
+                        
+                        
+                    },
+                    {
+                        
+                        text:"Open Developer Tools",
                         click:()=>{
                             remote.getCurrentWindow().webContents.openDevTools();
                         },
                         hotkey:"Ctrl+Shift+C"
-                    }
-                ]
-            },
-            {
-                text:"Edit",
-                popup:[
-                    {
-                        text:"undo",
-                        hotkey:"Ctrl+Z",
-                        click:()=>{
-                            console.log("undo");
-                        }
-                    },
-                    {
-                        text:"redo",
-                        hotkey:"Ctrl+Y",
-                        click:()=>{
-                            console.log("redo");
-                        }
+                        
                     },
                     {
                         line:true
                     },
                     {
-                        text:"cut",
-                        hotkey:"Ctrl+X",
+                        text:"Toggle Full Screen",
                         click:()=>{
-                            console.log("cut");
-                        }
-                    },
-                    {
-                        text:"copy",
-                        hotkey:"Ctrl+C",
-                        click:()=>{
-                            console.log("copy");
-                        }
-                    },
-                    {
-                        text:"paste",
-                        hotkey:"Ctrl+V",
-                        click:()=>{
-                            console.log("paste");
-                        }
+                            let titlebar = document.getElementById("TitleBar");
+                            if(titlebar.style.display =="none"){
+                                titlebar.style.removeProperty("display");
+                                remote.getCurrentWindow().setFullScreen(false);
+                            }
+                            else{
+                                titlebar.style.display = "none";
+                                remote.getCurrentWindow().setFullScreen(true);
+                            }
+
+
+                            
+                        },
+                        hotkey:"F11"
                     }
                 ]
             }
+
         ]
         
-        let titleBar = new TitleBar({darkMode:false},"../assets/electronlogo.png",menu);
+        let titleBar = new TitleBar({darkMode:true},"../assets/electronlogo.png",menu,"helloWorld");
         titleBar.append();
     </script>
     
