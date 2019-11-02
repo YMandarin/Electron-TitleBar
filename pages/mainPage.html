@@ -10,9 +10,65 @@
 
 <body>
     <script>
+        let menu = [
+            {
+                text:"File",
+                popup:[
+                    {
+                        text:"open devTools",
+                        click:()=>{
+                            remote.getCurrentWindow().webContents.openDevTools();
+                        },
+                        hotkey:"Ctrl+Shift+C"
+                    }
+                ]
+            },
+            {
+                text:"Edit",
+                popup:[
+                    {
+                        text:"undo",
+                        hotkey:"Ctrl+Z",
+                        click:()=>{
+                            console.log("undo");
+                        }
+                    },
+                    {
+                        text:"redo",
+                        hotkey:"Ctrl+Y",
+                        click:()=>{
+                            console.log("redo");
+                        }
+                    },
+                    {
+                        line:true
+                    },
+                    {
+                        text:"cut",
+                        hotkey:"Ctrl+X",
+                        click:()=>{
+                            console.log("cut");
+                        }
+                    },
+                    {
+                        text:"copy",
+                        hotkey:"Ctrl+C",
+                        click:()=>{
+                            console.log("copy");
+                        }
+                    },
+                    {
+                        text:"paste",
+                        hotkey:"Ctrl+V",
+                        click:()=>{
+                            console.log("paste");
+                        }
+                    }
+                ]
+            }
+        ]
         
-
-        let titleBar = new TitleBar({darkMode:true});
+        let titleBar = new TitleBar({darkMode:false},"../assets/electronlogo.png",menu);
         titleBar.append();
     </script>
     

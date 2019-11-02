@@ -1,0 +1,297 @@
+<!--
+<ul id="TitleBar-Menu">
+    <li class="TitleBar-MenuItem">
+        <Button class="TitleBar-MenuButton" onclick="menuButton_click(this,0)" onmouseover="menuButton_mouseover(this,0)">File</Button> 
+        <div class="TitleBar-MenuPopup">
+            <ul>
+                <li>
+                    <button class="TitleBar-MenuPopupButton"> see <span class="TitleBar-MenuPopupKeyshortcut">str+2</span> </button>
+                </li>
+                <li>
+                    <button class="TitleBar-MenuPopupButton"> see <span class="TitleBar-MenuPopupKeyshortcut">str+2</span> </button>
+                </li>
+                <li>
+                    <button class="TitleBar-MenuPopupButton"> see <span class="TitleBar-MenuPopupKeyshortcut">str+2</span> </button>
+                </li>
+                
+            </ul>
+        </div> 
+    </li>
+
+    <li class="TitleBar-MenuItem">
+        <Button class="TitleBar-MenuButton" onclick="menuButton_click(this,1)" onmouseover="menuButton_mouseover(this,1)">try</Button> 
+        <div class="TitleBar-MenuPopup">
+            <ul>
+                <li>
+                    <button class="TitleBar-MenuPopupButton">exit <span class="TitleBar-MenuPopupKeyshortcut">str+2</span> </button>
+                </li>
+                <li>
+                    <button class="TitleBar-MenuPopupButton"> see <span class="TitleBar-MenuPopupKeyshortcut">str+2</span> </button>
+                </li>
+                <li>
+                    <div class="TitleBar-MenuPopupLine"></div>
+                </li>
+                <li>
+                    <button class="TitleBar-MenuPopupButton"> see <span class="TitleBar-MenuPopupKeyshortcut">str+2</span> </button>
+                </li>
+                
+            </ul>
+        </div> 
+    </li>
+</ul>
+-->
+<style>
+
+button:focus{
+    outline:none;
+}
+
+ul{
+  list-style: none;
+  padding:0;
+}
+
+#TitleBar-Menu{
+    display:flex;
+    flex-direction: row;
+    padding:0;
+    margin:0;
+}
+
+.TitleBar-MenuPopup{
+    position:absolute;
+    background-color:rgb(34, 34, 36);
+    visibility:hidden;
+}
+
+.TitleBar-MenuPopup{
+    padding: 5px 0;
+    box-shadow: -2px 2px 3px rgba(10,10,10,0.6) , 0 3px 3px  rgba(10,10,10,6.4)  , 2px 2px 3px  rgba(10,10,10,0.6);
+}
+
+.TitleBar-MenuPopupButton{
+    color:white;
+    width:300px;
+    text-align: left;
+    height: 30px;
+    padding:0 20px;
+    background:none;
+    border:none;
+
+    
+}
+.TitleBar-MenuPopupButton:hover{
+    background-color:rgb(0, 78, 122);
+}
+
+
+.TitleBar-Menubutton{
+    color:white;
+    background:none;
+    border: none;
+    height:30px;
+    padding:0 10px;
+}
+
+.TitleBar-MenuPopupKeyShortcut{
+    color:rgb(150,150,150);
+    float:right;
+}
+.TitleBar-MenuButton:hover{
+  background-color:rgba(150,150,150,0.2);
+}
+.TitleBar-MenuPopupLine{
+    Margin:2px 10px;
+    border-bottom: rgb(100,100,100) 1px solid;
+}
+
+</style>
+
+<script>
+
+const domifiy = require("domify");
+const Hotkeys = require("hotkeys-js");
+
+let openedMenuItem;
+let openedIndex = - 1;
+
+let opened = false;
+
+document.addEventListener("click",function(ev){
+
+    if(!opened){
+
+        if(openedMenuItem!=null){
+
+            let rect = openedMenuItem.getBoundingClientRect();
+
+            if(!(rect.left < ev.clientX & ev.clientX < rect.right & rect.top < ev.clientY & ev.clientY < rect.bottom)){
+            
+                openedIndex = -1;
+                openedMenuItem = null;
+
+                let items = document.getElementsByClassName("TitleBar-MenuPopup")
+                for (let item of items){
+                    item.style.visibility = "hidden";
+                    item.parentNode.querySelector(".TitleBar-MenuButton").style.background = "none";
+                }
+            }
+        }   
+    }
+    opened = false;
+    
+    
+
+});
+
+function menuButton_click(sender,index){
+
+    if(openedIndex == -1){
+
+        opened = true;
+        let popup = sender.parentNode.querySelector(".TitleBar-MenuPopup");
+        popup.style.visibility = "visible";
+        openedMenuItem = popup;
+        openedIndex = index;
+        sender.style.backgroundColor = "rgba(150,150,150,0.2)";
+    }
+
+}
+
+function menuButton_mouseover(sender,index){
+    console.log(openedIndex,index);
+    if(openedIndex!=index & openedIndex!=-1){
+
+        openedMenuItem.style.visibility = "hidden";
+        openedMenuItem.parentNode.querySelector(".TitleBar-MenuButton").style.background = "none";
+        openedIndex = index;
+
+        let popup = sender.parentNode.querySelector(".TitleBar-MenuPopup");
+        popup.style.visibility = "visible";
+        openedMenuItem = popup;
+        sender.style.backgroundColor = "rgba(150,150,150,0.2)";
+    }
+}
+
+menu = [
+    {
+        text:"file",
+        popup: [
+            {
+                text:"new File",
+                hotkey:"Ctrl+n",
+                click:function(){
+                    console.log("new File");
+                }
+
+            },
+            {
+                line:true
+            },
+            {
+                text:"new Window",
+                hotkey: "Ctrl+s+o",
+                click:function(){
+                    console.log("new Window");
+                }
+            }
+        ]
+    },
+    {
+        text:"Edit",
+        click:function(){
+            console.log("edit")
+        }
+    }
+]
+
+
+function menuButton_events(sender,index){
+    menu[index].click();
+}
+
+function popupButton_events(sender,i1,i2){
+    menu[i1].popup[i2].click();
+}
+
+
+function setHotkeys(menu){
+    for(let item of menu){
+
+        if(item !=null & item.popup != null){
+
+            
+            for(let button of item.popup){
+                if(button.hotkey != null & button.hotkey!="" & button.click !=null){
+
+                    let hotkey = button.hotkey;
+                    hotkey.trim();
+                    hotkey.toLowerCase();
+
+                    Hotkeys(hotkey,function(event,handler){
+                        event.preventDefault();
+                        button.click();
+                    });
+                }
+            }       
+        }
+    }
+}
+
+function create(menu){
+    let clicks = [];
+
+    let html = "";
+
+    html += `<ul id="TitleBar-Menu">\n`;
+
+    let i1 = 0;
+    let i2 = 0;
+
+    for (let item of menu){
+        i2 = 0;
+        html += `<li class="TitleBar-MenuItem">\n`;
+
+        if(item.click!=null){
+            console.log("click");
+            html += `<Button class="TitleBar-MenuButton" onclick="menuButton_events(this,${i1})">${item.text}</Button>\n`
+        }
+        else{
+            if(item.popup!=[] || item.popup!=null){
+                html += `<Button class="TitleBar-MenuButton" onclick="menuButton_click(this,${i1})" onmouseover="menuButton_mouseover(this,${i1})">${item.text}</Button> 
+                    <div class="TitleBar-MenuPopup">
+                    <ul>\n`
+                
+                for (let button of item.popup){
+                    html += `<li>\n`;
+                        if(!button.line){
+                            html +=  `<button class="TitleBar-MenuPopupButton" onclick="popupButton_events(this,${i1},${i2})"> ${button.text} <span class="TitleBar-MenuPopupKeyshortcut">${button.hotkey}</span> </button>\n`;
+                        }
+                        else{
+                            html +=  `<div class="TitleBar-MenuPopupLine"></div>\n`;
+                        }
+
+                    html += `</li>\n`;
+                    i2++;
+                }
+                html+= `</ul>\n`
+            }
+        }
+
+        html += `</li>\n`;
+        i1++;
+    }
+
+    html += `</ul>\n`;
+
+    return html;
+
+}
+
+window.onload = ()=>{
+    document.querySelector("body").appendChild(domifiy(create(menu),document));
+    setHotkeys(menu);
+}
+
+
+</script>
