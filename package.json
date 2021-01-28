@@ -11,7 +11,7 @@
   "dependencies": {
     "defaultcss": "^1.1.1",
     "domify": "^1.4.0",
-    "electron": "^7.0.0",
+    "electron": "^9.4.0",
     "hotkeys-js": "^3.7.2"
   }
 }
